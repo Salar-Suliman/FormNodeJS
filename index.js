@@ -32,9 +32,29 @@ app.get('/user/create', (req, res) => {
 
 
 })
-app.get('/users/verify/:uuid', function (req, res) {
-console.log(req.params);
+app.get('/user/verify/:id', (req, res) => {
+  console.log(req.params.id)
+  //open your files folder fs.readDir
+  fs.readFile(`./users/${req.params.id}.json`, (err, file) => {
+    if (err) console.log('Error', err);
+    else {
+      var file = JSON.parse(file)
+      //set that document status to confirmed
+      if (file.uuid === req.params.id) {
+        console.log("current file uuid:", file.uuid)
+        file.status = "confirmed";
+        //write file back
+        fs.writeFile(`./users/${req.params.id}.json`, JSON.stringify(file), (err) => {
+          if (err) {
+            return console.log(err);
+          }
 
-  res.send('Got a PUT request at /user')
-})
+          console.log("The Email was confirmed!");
+          //redirect to /
+          res.redirect("/");
+        });
+      }
+    };
+  });
+});
 app.listen(4000, () => console.log('Example app listening on port 4000!'))
